@@ -1,0 +1,385 @@
+<?php
+// $Id$
+
+/**
+* Implement hook_menu().
+*/
+function bimpgallery_menu() {
+  $items = array();
+  $items['admin/config/user-interface/bimpgallery'] = array(
+  'title' => 'BlueImp Gallery',
+  'description' => 'Configuration for the bimpgallery module.',
+  'page callback' => 'drupal_get_form',
+  'page arguments' => array('bimpgallery_form'),
+  'access arguments' => array('administer users'),
+  'type' => MENU_NORMAL_ITEM,
+  );
+return $items;
+}
+
+
+
+/**
+* Form builder; Create and display the bimpgallery configuration
+* settings form.
+*/
+function bimpgallery_form($form, &$form_state) {
+
+  $form['fieldset'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('BlueImp Configuration Options'),
+    '#collapsible' => TRUE, // Added
+    '#collapsed' => FALSE,  // Added
+  );
+
+  $form['fieldset']['bimpgallery_displayTransition'] = array(
+  '#type' => 'checkbox',
+  '#title' => t('Display Transition'),
+  '#description' => t('If set the gallery listens for transitionend events before triggering the opened and closed events'),
+  '#default_value' =>variable_get('bimpgallery_displayTransition',True),
+  );
+
+
+  $form['fieldset']['bimpgallery_clearSlides'] = array(
+  '#type' => 'checkbox',
+  '#title' => t('Clear Slides'),
+  '#description' => t('Defines if the gallery slides are cleared from the gallery modal, or reused for the next gallery initialization:'),
+  '#default_value' =>variable_get('bimpgallery_clearSlides',True),
+  );
+
+  $form['fieldset']['bimpgallery_stretchImages'] = array(
+  '#type' => 'checkbox',
+  '#title' => t('Stretch Images'),
+  '#description' => t('Defines if images should be stretched to fill the available space, while maintaining their aspect ratio 
+   (will only be enabled for browsers supporting background-size="contain", which excludes IE < 9).
+   Set to "cover", to make images cover all available space (requires support for background-size="cover", which excludes IE < 9)'),
+  '#default_value' =>variable_get('bimpgallery_stretchImages',False),
+  );
+
+
+  $form['fieldset']['bimpgallery_toggleControlsOnReturn'] = array(
+  '#type' => 'checkbox',
+  '#title' => t('Toggle Controls On Return'),
+  '#description' => t('Toggle the controls on pressing the Return key'),
+  '#default_value' =>variable_get('bimpgallery_toggleControlsOnReturn',True),
+  );
+
+
+
+  $form['fieldset']['bimpgallery_toggleSlideshowOnSpace'] = array(
+  '#type' => 'checkbox',
+  '#title' => t('Toggle Slideshow On Space'),
+  '#description' => t('Toggle the automatic slideshow interval on pressing the Space key'),
+  '#default_value' =>variable_get('bimpgallery_toggleSlideshowOnSpace',True),
+  );
+
+
+
+  $form['fieldset']['bimpgallery_enableKeyboardNavigation'] = array(
+  '#type' => 'checkbox',
+  '#title' => t('Enable Keyboard Navigation'),
+  '#description' => t('Navigate the gallery by pressing left and right on the keyboard'),
+  '#default_value' =>variable_get('bimpgallery_enableKeyboardNavigation',True),
+  );
+
+
+
+  $form['fieldset']['bimpgallery_closeOnEscape'] = array(
+  '#type' => 'checkbox',
+  '#title' => t('Close On Escape'),
+  '#description' => t('Close the gallery on pressing the ESC key'),
+  '#default_value' =>variable_get('bimpgallery_closeOnEscape',True),
+  );
+
+
+
+  $form['fieldset']['bimpgallery_closeOnSlideClick'] = array(
+  '#type' => 'checkbox',
+  '#title' => t('Close On Slide Click'),
+  '#description' => t('Close the gallery when clicking on an empty slide area'),
+  '#default_value' =>variable_get('bimpgallery_closeOnSlideClick',True),
+  );
+
+
+
+  $form['fieldset']['bimpgallery_closeOnSwipeUpOrDown'] = array(
+  '#type' => 'checkbox',
+  '#title' => t('Close On Swipe Up Or Down'),
+  '#description' => t('Close the gallery by swiping up or down'),
+  '#default_value' =>variable_get('bimpgallery_closeOnSwipeUpOrDown',True),
+  );
+
+
+
+  $form['fieldset']['bimpgallery_emulateTouchEvents'] = array(
+  '#type' => 'checkbox',
+  '#title' => t('Emulate Touch Events'),
+  '#description' => t('Emulate touch events on mouse-pointer devices such as desktop browsers'),
+  '#default_value' =>variable_get('bimpgallery_emulateTouchEvents',True),
+  );
+
+
+  $form['fieldset']['bimpgallery_stopTouchEventsPropagation'] = array(
+  '#type' => 'checkbox',
+  '#title' => t('Stop Touch Events Propagation'),
+  '#description' => t('Stop touch events from bubbling up to ancestor elements of the Gallery'),
+  '#default_value' =>variable_get('bimpgallery_stopTouchEventsPropagation',False),
+  );
+
+
+
+  $form['fieldset']['bimpgallery_hidePageScrollbars'] = array(
+  '#type' => 'checkbox',
+  '#title' => t('Hide Page Scrollbars'),
+  '#description' => t('Hide the page scrollbars'),
+  '#default_value' =>variable_get('bimpgallery_hidePageScrollbars',True),
+  );
+
+
+
+  $form['fieldset']['bimpgallery_disableScroll'] = array(
+  '#type' => 'checkbox',
+  '#title' => t('Disable Scroll'),
+  '#description' => t('Stops any touches on the container from scrolling the page'),
+  '#default_value' =>variable_get('bimpgallery_disableScroll',True),
+  );
+
+
+
+  $form['fieldset']['bimpgallery_transitionSpeed'] = array(
+  '#type' => 'textfield',
+  '#title' => t('Transition Speed'),
+  '#size' => 10,
+  '#description' => t('The transition speed between slide changes in milliseconds'),
+  '#default_value' =>variable_get('bimpgallery_transitionSpeed',400),
+  );
+
+
+
+  return system_settings_form($form);
+}// end bimpgallery_form
+
+
+
+
+/*
+function bimpgallery_preprocess_image_style(&$vars) {
+        $vars['attributes']['class'][] = 'img-viglia';
+}
+*/
+
+
+/**
+* hook_field_formatter_info() - This tells Drupal what fields it applies to and what settings are available.
+*/
+function bimpgallery_field_formatter_info() {
+  $formatters = array(
+    'imageBlueImp' => array(
+      'label' => t('BlueImp'),
+      'field types' => array('image'),
+      'settings' => array(
+        'image_style' => '',
+        'image_link' => '',
+      ),
+    ),
+  );
+
+  return $formatters;
+}
+
+
+/**
+* hook_field_formatter_settings_summary() - This displays the chosen settings on the 'Manage Display' page
+*/
+function bimpgallery_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  $summary = array();
+
+  $image_styles = image_style_options(FALSE, PASS_THROUGH);
+  // Unset possible 'No defined styles' option.
+  unset($image_styles['']);
+  // Styles could be lost because of enabled/disabled modules that defines
+  // their styles in code.
+  if (isset($image_styles[$settings['image_style']])) {
+    $summary[] = t('Image style: @style', array('@style' => $image_styles[$settings['image_style']]));
+  }
+  else {
+    $summary[] = t('Original image');
+  }
+/*
+  $link_types = array(
+    'content' => t('Linked to content'),
+    'file' => t('Linked to file'),
+  );
+  // Display this setting only if image is linked.
+  if (isset($link_types[$settings['image_link']])) {
+    $summary[] = $link_types[$settings['image_link']];
+  }
+*/
+  return implode('<br />', $summary);
+}
+
+
+
+
+
+
+/**
+* hook_field_formatter_settings_form() - Here we'll tell Drupal how to generate the form that collects the options.
+*/
+function bimpgallery_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  $image_styles = image_style_options(FALSE, PASS_THROUGH);
+  $element['image_style'] = array(
+    '#title' => t('Image style'),
+    '#type' => 'select',
+    '#default_value' => $settings['image_style'],
+    '#empty_option' => t('None (original image)'),
+    '#options' => $image_styles,
+  );
+/*
+  $link_types = array(
+    'content' => t('Content'),
+    'file' => t('File'),
+  );
+  $element['image_link'] = array(
+    '#title' => t('Link image to'),
+    '#type' => 'select',
+    '#default_value' => $settings['image_link'],
+    '#empty_option' => t('Nothing'),
+    '#options' => $link_types,
+  );
+*/
+  return $element;
+}
+
+
+
+
+/**
+* hook_field_formatter_view() - This is the hook where we actually do the formatting
+*/
+function bimpgallery_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+
+  // Check if the formatter involves a link.
+/*
+  if ($display['settings']['image_link'] == 'content') {
+    $uri = entity_uri($entity_type, $entity);
+  }
+  elseif ($display['settings']['image_link'] == 'file') {
+    $link_file = TRUE;
+  }
+*/
+  foreach ($items as $delta => $item) {
+    if (isset($link_file)) {
+      $uri = array(
+        'path' => file_create_url($item['uri']),
+        'options' => array(),
+      );
+    }
+    $element[$delta] = array(
+      '#theme' => 'bimpgallery_formatter',
+      '#item' => $item,
+      '#image_style' => $display['settings']['image_style'],
+      '#path' => isset($uri) ? $uri : '',
+    );
+  }
+
+  return $element;
+}
+
+
+
+
+
+
+function theme_bimpgallery_formatter($variables) {
+  $item = $variables['item'];
+  $image = array(
+    'path' => $item['uri'],
+  );
+
+  if (array_key_exists('alt', $item)) {
+    $image['alt'] = $item['alt'];
+  }
+
+  if (isset($item['attributes'])) {
+    $image['attributes'] = $item['attributes'];
+  }
+  $image['attributes']['class'] = 'blueimp-img';
+
+  if (isset($item['width']) && isset($item['height'])) {
+    $image['width'] = $item['width'];
+    $image['height'] = $item['height'];
+  }
+
+  // Do not output an empty 'title' attribute.
+  if (isset($item['title']) && drupal_strlen($item['title']) > 0) {
+    $image['title'] = $item['title'];
+  }
+
+  if ($variables['image_style']) {
+    $image['style_name'] = $variables['image_style'];
+    $output = theme('image_style', $image);
+  }
+  else {
+    $output = theme('image', $image);
+  }
+
+  // The link path and link options are both optional, but for the options to be
+  // processed, the link path must at least be an empty string.
+  if (isset($variables['path']['path'])) {
+    $path = $variables['path']['path'];
+    $options = isset($variables['path']['options']) ? $variables['path']['options'] : array();
+    // When displaying an image inside a link, the html option must be TRUE.
+    $options['html'] = TRUE;
+    $output = l($output, $path, $options);
+  }
+
+  return $output;
+}
+
+function bimpgallery_init(){
+  drupal_add_js(array('bimpgallery' => array(
+
+      'displayTransition' =>variable_get('bimpgallery_displayTransition',True),
+      'clearSlides' =>variable_get('bimpgallery_clearSlides',True),
+      'stretchImages' => variable_get('bimpgallery_stretchImages',False),
+      'toggleControlsOnReturn' => variable_get('bimpgallery_toggleControlsOnReturn',True),
+      'toggleSlideshowOnSpace' => variable_get('bimpgallery_toggleSlideshowOnSpace',True),
+      'enableKeyboardNavigation' =>variable_get('bimpgallery_enableKeyboardNavigation',True),
+      'closeOnEscape' =>variable_get('bimpgallery_closeOnEscape',True),
+      'closeOnSlideClick' =>variable_get('bimpgallery_closeOnSlideClick',True),
+      'closeOnSwipeUpOrDown' =>variable_get('bimpgallery_closeOnSwipeUpOrDown',True),
+      'emulateTouchEvents' =>variable_get('bimpgallery_emulateTouchEvents',TRUE),
+      'stopTouchEventsPropagation' =>variable_get('bimpgallery_stopTouchEventsPropagation',False),
+      'hidePageScrollbars' =>variable_get('bimpgallery_hidePageScrollbars',True),
+      'disableScroll' =>variable_get('bimpgallery_disableScroll',True),
+      'transitionSpeed' => intval(variable_get('bimpgallery_transitionSpeed',400))
+  ))
+  , 'setting');
+
+}
+
+
+
+/**
+* Implements hook_theme().
+*/
+function bimpgallery_theme($existing, $type, $theme, $path) {
+  return array(
+    'bimpgallery_formatter' => array(
+      'variables' => array(
+        'item' => NULL,
+        'image_style' => NULL,
+        'path' => NULL,
+        'attributes' => array(),
+      ), 
+    ),
+  );
+}

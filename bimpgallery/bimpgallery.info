@@ -1,0 +1,12 @@
+;$Id$
+name = Blueimp Gallery
+description = A BlueImp gallery module.
+package = Drupal 7 Development
+core = 7.x
+files[] = bimgallery.module
+scripts[] = functions.js
+scripts[] = js/blueimp-gallery.min.js
+stylesheets[all][] = css/blueimp-gallery.min.css
+stylesheets[all][] = css/blueimp-gallery.css
+stylesheets[all][] = css/blueimp-gallery-indicator.css
+
